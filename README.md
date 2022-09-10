@@ -7,7 +7,7 @@ This is a text mode windowing library complete with window controls and modern g
 
 The windowing system preserves the contents under a window, but is not z-order based (by design).  It is up to you to open and close windows in the correct order.  Complete sample programs are included, as well as full API documentation.
 
-I originally wrote this in Action! language for the Atari 8 bit starting around 2015.
+I originally wrote this in Action! language for the Atari 8 bit starting in 2015.  I added to it continually up through this year (2022).
 
 I ran into some limitations with the Action! version in a project regarding memory space and function paramater size when compiled into a standlone executable.  This prompted the conversion into C.   I considered several C implementations on the Atari 8 bit itself, then settled on CC65 to use modern development tools and target the A8 platform.
 

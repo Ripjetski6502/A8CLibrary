@@ -1,3 +1,4 @@
+// --------------------------------------------------
 // Library: a8defines.h
 // Desc...: Atari 8 Bit Library Definitions
 // Author.: Wade Ripkowski
@@ -5,13 +6,14 @@
 // License: GNU General Public License v3.0
 // Note...: Requires: a8defwin.c
 //          -Converted from Action!
-// Revised:
+// Revised: 2023.08-Added SIO and FujiNet
+// --------------------------------------------------
 
 #ifndef A8DEFINES_H
 #define A8DEFINES_H
 
 // Version
-#define LIB_VERSION "1.0.0"
+#define LIB_VERSION "1.2.0"
 
 // True & False
 #ifndef TRUE
@@ -176,5 +178,11 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define CHRGT_I 159
 #define CHO_L   111
 #define CHI_I   201
+
+// DCB (Device Control Block) modes
+#define DCBNONE  0x00
+#define DCBREAD  0x40
+#define DCBWRITE 0x80
+#define DCBRW    0xC0
 
 #endif

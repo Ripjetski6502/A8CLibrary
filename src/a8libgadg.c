@@ -11,7 +11,10 @@
 //          a8libstr.c
 //          a8libmisc.c
 //          unistd.h (cc65)
-// Revised:
+// Revised: 2023.03.13-Revised SPACE in GCheck.
+//                     Added ENTER to GCheck.
+//                     Revised TAB in GCheck, GRadio, GSpin for consistency.
+//          2023.07.28-Set GAlert min string width to 8.
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -42,8 +45,15 @@ void GAlert(unsigned char *pS)
 {
     byte bW, bL, x;
 
-    // Find left window position
+    // Find string length
     bL = strlen(pS);
+
+    // Ensure min window width met
+    if (bL < 8) {
+        bL = 8;
+    }
+
+    // Find left window position
     x = ((38 - bL) / 2);
 
     // Show window
@@ -203,29 +213,28 @@ byte GCheck(byte bN, byte x, byte y, byte bI, byte bD)
                 bR = XESC;
                 bF = TRUE;
             }
-            else if (bK == KTAB) {
-                // Set tab exit and exit flag
-                bR = XTAB;
+            else if ((bK == KTAB) || (bK == KENTER)){
+                // Accept value and exit
+                bR = bC;
                 bF = TRUE;
             }
             else if ((bK == KSPACE) || (bK == KX) || (bK == KX_S)) {
                 // Toggle value
                 bC = (bC == GCON ? GCOFF : GCON);
                 bR = bC;
-                bF = TRUE;
             }
         }
     }
 
     // If current and return are same
-    if (bR == bC) {
+//    if (bR == bC) {
         // Show exit value
-        WPrint(bN, x+1, y, WOFF, (bR == GCON ? "X" : " "));
-    }
-    else {
+        WPrint(bN, x+1, y, WOFF, (bC == GCON ? "X" : " "));
+//    }
+//    else {
         // Show default value (no change)
-        WPrint(bN, x+1, y, WOFF, (bD == GCON ? "X" : " "));
-    }
+//        WPrint(bN, x+1, y, WOFF, (bD == GCON ? "X" : " "));
+//    }
 
     return(bR);
 }
@@ -318,17 +327,12 @@ byte GRadio(byte bN, byte x, byte y, byte bD, byte bE, byte bI, byte bS, unsigne
                 bR = XESC;
                 bF = TRUE;
             }
-            // Tab
-            else if (bK == KTAB) {
-                bR == XTAB;
-                bF = TRUE;
-            }
             // Space
             else if (bK == KSPACE) {
                 bR = bC;
             }
-            // Enter
-            else if (bK == KENTER) {
+            // Tab or Enter
+            else if ((bK == KTAB) || (bK == KENTER)) {
                 bR = bC;
                 bF = TRUE;
             }
@@ -402,12 +406,7 @@ byte GSpin(byte bN, byte x, byte y, byte bL, byte bM, byte bI, byte bE)
                 bF = TRUE;
                 sprintf(cL, "%3d", bI);
             }
-            else if (bK == KTAB) {
-                bR = XTAB;
-                bF = TRUE;
-                sprintf(cL, "%3d", bI);
-            }
-            else if (bK == KENTER) {
+            else if ((bK == KTAB) || (bK == KENTER)) {
                 bR = bD;
                 bF = TRUE;
                 sprintf(cL, "%3d", bD);

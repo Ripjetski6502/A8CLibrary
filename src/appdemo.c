@@ -118,7 +118,7 @@ byte FormInput(void)
 
         // ----- Spinner Input -----
         bV = GSpin(bW1, 8, 6, 0, 100, bVp, GEDIT);
-        if ((bV != XESC) && (bV != XTAB)) {
+        if (bV != XESC) {
             bVp = bV;
         }
 
@@ -130,7 +130,7 @@ byte FormInput(void)
         bRA = GRadio(bW1, 2, 9, GHORZ, GEDIT, bRAp, 3, prA);
 
         // If not bypass, set previous selected value
-        if ((bRA != XESC) && (bRA != XTAB)) {
+        if (bRA != XESC) {
             bRAp = bRA;
         }
 
@@ -141,7 +141,7 @@ byte FormInput(void)
         bRB = GRadio(bW1, 2, 12, GVERT, GEDIT, bRBp, 3, prB);
 
         // If not bypass, set previous selected value
-        if ((bRB != XESC) && (bRB != XTAB)) {
+        if (bRB != XESC) {
             bRBp = bRB;
         }
 
@@ -152,38 +152,31 @@ byte FormInput(void)
         // Set footer
         WOrn(bW1, WPBOT, WPLFT, cX);
 
-        // Stay on this check until ESC, TAB, or set
-        do {
-            // Display button and get choice
-            bCha = GCheck(bW1, 21, 12, GEDIT, bChap);
+        // Display checkbox and get choice
+        bCha = GCheck(bW1, 21, 12, GEDIT, bChap);
 
-            // If not ESC or TAB, set previous value
-            if ((bCha != XESC) && (bCha != XTAB)) {
-                bChap = bCha;
-            }
-        } while ((bCha != XESC) && (bCha != XTAB));
+        // If not ESC, set previous value
+        if (bCha != XESC) {
+            bChap = bCha;
+        }
 
-        // Stay on this check until ESC, TAB, or set
-        do {
-            // Display button and get choice
-            bChb = GCheck(bW1, 21, 13, GEDIT, bChbp);
+        GCheck(bW1, 21, 12, GDISP, bChap);
 
-            // If not ESC or TAB, set previous value
-            if ((bChb != XESC) && (bChb != XTAB)) {
-                bChbp = bChb;
-            }
-        } while ((bChb != XESC) && (bChb != XTAB));
+        // Display checkbox and get choice
+        bChb = GCheck(bW1, 21, 13, GEDIT, bChbp);
 
-        // Stay on this check until ESC, TAB, or set
-        do {
-            // Display button and get choice
-            bChc = GCheck(bW1, 21, 14, GEDIT, bChcp);
+        // If not ESC or TAB, set previous value
+        if (bChb != XESC) {
+            bChbp = bChb;
+        }
 
-            // If not ESC or TAB, set previous value
-            if ((bChc != XESC) && (bChc != XTAB)) {
-                bChcp = bChc;
-            }
-        } while ((bChc != XESC) && (bChc != XTAB));
+        // Display checkbox and get choice
+        bChc = GCheck(bW1, 21, 14, GEDIT, bChcp);
+
+        // If not ESC or TAB, set previous value
+        if (bChc != XESC) {
+            bChcp = bChc;
+        }
 
         // Set footer
         WOrn(bW1, WPBOT, WPLFT, cF);
@@ -299,7 +292,7 @@ void About(void)
 // ------------------------------------------------------------
 void SubMenu(void)
 {
-    byte bW1, bC;
+    byte bW1, bC = 1;
     byte bD = FALSE;
     unsigned char *pcM[4] = { " Sub-Item 1 ", " Sub-Item 2 ", " Sub-Item 3 " };
 
@@ -310,7 +303,7 @@ void SubMenu(void)
     // Loop until exit
     while (! bD) {
         // Display menu and get choice
-        bC = MenuV(bW1, 1, 1, WOFF, 1, 3, pcM);
+        bC = MenuV(bW1, 1, 1, WOFF, bC, 3, pcM);
 
         // Process choice
         switch (bC)
@@ -343,7 +336,7 @@ void SubMenu(void)
 void main(void)
 {
     // Variables
-    byte bW1, bW2, bC;
+    byte bW1, bW2, bC = 1;
     byte bD = FALSE;
     unsigned char *pcM[6] =
       { " Input Form   ", " Progress Bar ", " Sub-Menu     ", " About        ", " Exit         " };
@@ -363,7 +356,7 @@ void main(void)
     // Loop until done (Exit selected)
     while (! bD) {
         // Call menu
-        bC = MenuV(bW2, 1, 2, WON, 1, 5, pcM);
+        bC = MenuV(bW2, 1, 2, WON, bC, 5, pcM);
 
         // Process choice
         switch (bC) {

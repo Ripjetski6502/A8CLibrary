@@ -94,23 +94,29 @@ void StrIA(unsigned char *pS, byte bS)
 
     // Process each element
     for (bL=0; bL < bS; bL++) {
-        if ((*(pS) >= 0) && (*(pS) <= 63)) {
-            *(pS) += 32;
+        if (*(pS) < 128) {
+            if (*(pS) < 64) {
+                *(pS) += 32;
+            }
+            else if (*(pS) <= 96) {
+                *(pS) -= 64;
+            }
         }
-        else if ((*(pS) >= 64) && (*(pS) <= 95)) {
-            *(pS) -= 64;
-        }
-        else if ((*(pS) >= 128) && (*(pS) <= 154)) {
-            *(pS) += 32;
-        }
-        else if ((*(pS) >= 160) && (*(pS) <= 191)) {
-            *(pS) += 32;
-        }
-        else if ((*(pS) >= 192) && (*(pS) <= 223)) {
-            *(pS) -= 64;
+        else {
+            /* FIXME: ??? */
+            if (*(pS) <= 154) {
+                *(pS) += 32;
+            }
+            else if ((*(pS) >= 160) && (*(pS) < 192)) {
+                *(pS) += 32;
+            }
+            else if (*(pS) < 224) {
+                *(pS) -= 64;
+            }
         }
 
         // Incement pointer to next char
         *pS++;
     }
 }
+

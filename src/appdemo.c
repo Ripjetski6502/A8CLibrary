@@ -22,6 +22,8 @@
 #include "a8libgadg.c"
 #include "a8libmenu.c"
 
+#define PERF_TEST
+
 // Prototypes
 void DoSpin(void);
 byte FormInput(void);
@@ -40,6 +42,7 @@ void About(void);
 #pragma static-locals(push, on)
 byte FormInput(void)
 {
+    byte i;
     byte bR = FALSE, bRA = 1, bRB = 1, bChap = GCOFF, bChbp = GCON, bChcp = GCOFF, bV = 10;
     byte bW1, bM, bA, bB, bC, bD, bVp, bRAp, bRBp, bCha, bChb, bChc;
     // Regular buttons, radio buttons, and data field names
@@ -50,6 +53,9 @@ byte FormInput(void)
     // Input strings & navigation strings
     unsigned char cA[41], cB[41], cC[41], cD[41],
                   cF[15], cI[15], cR[15], cX[15];
+
+    OS.rtclok[1] = 0;
+    OS.rtclok[2] = 0;
 
     // Define navigation strings
     sprintf(cF, "Nav:%c%c%c%c%c%c%c   ", CHUP, CHDN, CHLFT, CHRGT, CHTAB, CHESC, CHBTRGT);
@@ -98,11 +104,21 @@ byte FormInput(void)
 
     GButton(bW1, 21, 16, GDISP, 2, paB);
 
+#ifdef PERF_TEST
+    for (i = 0; i < 100; i++) {
+    OS.color4 = i;
+#endif
     // Display fields as is
     WPrint(bW1, 8, 2, WOFF, cA);
     WPrint(bW1, 8, 3, WOFF, cB);
     WPrint(bW1, 8, 4, WOFF, cC);
     WPrint(bW1, 8, 5, WOFF, cD);
+#ifdef PERF_TEST
+    }
+
+    sprintf(cD, "%5d-------------------------------------", OS.rtclok[2] + OS.rtclok[1] * 256);
+    WPrint(bW1, 8, 5, WOFF, cD);
+#endif
 
     // Loop until form accepted
     do {

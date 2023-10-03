@@ -11,6 +11,8 @@
 #ifndef A8DEFWIN_H
 #define A8DEFWIN_H
 
+#define NUM_WIN 11
+
 // Window handle info
 typedef struct {
     unsigned char bU,bX,bY,bW,bH,bI;
@@ -18,7 +20,7 @@ typedef struct {
     unsigned int cZ;
 } td_wnrec;
 
-td_wnrec baW[11];
+td_wnrec baW[NUM_WIN];
 //td_wnrec *pWn;
 
 

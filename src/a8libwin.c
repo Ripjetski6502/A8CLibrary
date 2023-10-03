@@ -34,6 +34,8 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS);
 byte WDiv(byte bN, byte y, byte bD);
 byte WClr(byte bN);
 
+unsigned int SCRMEM;
+unsigned int SCRMEM_row[24];
 
 // --------------------------------------------------
 // Function: void WInit(void)
@@ -57,7 +59,7 @@ void WInit(void)
     cpWM = baWM;
 
     // Work on 10 window+system handles
-    for(bL=0; bL < 11; bL++) {
+    for(bL=0; bL < NUM_WIN; bL++) {
         // Clear window handle record vars
         baW[bL].bU = WOFF;
         baW[bL].bX = 0;
@@ -72,6 +74,11 @@ void WInit(void)
     // Set virtual cursor coords
     vCur.vX = 0;
     vCur.vY = 0;
+
+    SCRMEM = PEEKW(88);
+    for (bL = 0; bL < 24; bL++) {
+      SCRMEM_row[bL] = SCRMEM + (bL * 40);
+    }
 }
 
 
@@ -84,7 +91,7 @@ void WInit(void)
 void WBack(byte bN)
 {
     // Fill screen memory with char
-    memset((void *) PEEKW(RSCRN), bN, 960);
+    memset(SCRMEM, bN, 960);
 }
 
 
@@ -128,7 +135,7 @@ byte WOpen(byte x, byte y, byte w, byte h, byte bT)
             baW[bL].bI = bT;
 
             // Find top left corner of window in memory
-            pS = PEEKW(RSCRN) + (y * 40) + x;
+            pS = SCRMEM_row[y] + x;
 
             // Draw window
             for(bD=0; bD <= h-1; bD++) {
@@ -204,7 +211,7 @@ byte WClose(byte bN)
     // Only if handle in use
     if (baW[bN].bU == WON) {
         // Find top left corner of window in screen memory
-        pS = PEEKW(RSCRN) + (baW[bN].bY * 40) + baW[bN].bX;
+        pS = SCRMEM_row[baW[bN].bY] + baW[bN].bX;
 
         // Set temp ptr to start of win mem
         pA = baW[bN].cM;
@@ -373,11 +380,8 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
             StrInv(cL, bL);
         }
 
-        // Find top left corner of window in scrn mem (inside frame)
-        cS = PEEKW(RSCRN) + (baW[bN].bY*40) + baW[bN].bX;
-
-        // Add 40 for each row (Y)
-        cS += (y * 40);
+        // Find row, from top left corner of window, in scrn mem (inside frame)
+        cS = SCRMEM_row[baW[bN].bY + y] + baW[bN].bX;
 
         // If not center, move to X pos
         if (x != WPCNT) {
@@ -438,7 +442,7 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
         }
 
         // Find window top screen location
-        cS = PEEKW(RSCRN) + (baW[bN].bY * 40);
+        cS = SCRMEM_row[baW[bN].bY];
 
         // If bottom find lower location
         if (bT == WPBOT) {
@@ -515,7 +519,7 @@ byte WDiv(byte bN, byte y, byte bD)
         }
 
         // Find location on screen
-        cS = PEEKW(RSCRN) + ((baW[bN].bY + y) * 40) + baW[bN].bX;
+        cS = SCRMEM_row[baW[bN].bY + y] + baW[bN].bX;
 
         // Move to screen
         memcpy(cS, cL, bS);
@@ -545,7 +549,7 @@ byte WClr(byte bN)
     // Only if window in use
     if (baW[bN].bU == WON) {
         // Find top left corner of window in screen memory (inside frame)
-        cS = PEEKW(RSCRN) + (baW[bN].bY * 40) + baW[bN].bX + 41;
+        cS = SCRMEM_row[baW[bN].bY] + baW[bN].bX + 41;
 
         // Determine width (minus frames)
         bS = baW[bN].bW - 2;

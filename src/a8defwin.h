@@ -15,12 +15,12 @@
 
 // Window handle info
 typedef struct {
-    unsigned char bU,bX,bY,bW,bH,bI;
-    unsigned char *cM;
-    unsigned int cZ;
+    unsigned char bU[NUM_WIN],bX[NUM_WIN],bY[NUM_WIN],bW[NUM_WIN],bH[NUM_WIN],bI[NUM_WIN];
+    unsigned char *cM[NUM_WIN];
+    unsigned int cZ[NUM_WIN];
 } td_wnrec;
 
-td_wnrec baW[NUM_WIN];
+td_wnrec baW;
 //td_wnrec *pWn;
 
 

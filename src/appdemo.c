@@ -42,9 +42,8 @@ void About(void);
 #pragma static-locals(push, on)
 byte FormInput(void)
 {
-    byte i;
     byte bR = FALSE, bRA = 1, bRB = 1, bChap = GCOFF, bChbp = GCON, bChcp = GCOFF, bV = 10;
-    byte bW1, bM, bA, bB, bC, bD, bVp, bRAp, bRBp, bCha, bChb, bChc;
+    byte bW1, bW2, bM, bA, bB, bC, bD, bVp, bRAp, bRBp, bCha, bChb, bChc, bL = 0;
     // Regular buttons, radio buttons, and data field names
     unsigned char *paB[3] = { "[ Ok ]", "[Cancel]" },
                   *prA[4] = { "One", "Two", "Three" },
@@ -52,10 +51,8 @@ byte FormInput(void)
                   *paD[5] = { "Numer", "Alpha", "AlNum", "Any.." };
     // Input strings & navigation strings
     unsigned char cA[41], cB[41], cC[41], cD[41],
-                  cF[15], cI[15], cR[15], cX[15];
-
-    OS.rtclok[1] = 0;
-    OS.rtclok[2] = 0;
+                  cF[15], cI[15], cR[15], cX[15],
+                  cT[15];
 
     // Define navigation strings
     sprintf(cF, "Nav:%c%c%c%c%c%c%c   ", CHUP, CHDN, CHLFT, CHRGT, CHTAB, CHESC, CHBTRGT);
@@ -73,6 +70,10 @@ byte FormInput(void)
     bRAp = bRA;
     bRBp = bRB;
     bVp = bV;
+
+    // Reset clock
+    OS.rtclok[1] = 0;
+    OS.rtclok[2] = 0;
 
     // Open window & draw form
     bW1 = WOpen(2, 4, 36, 18, WOFF);
@@ -104,21 +105,37 @@ byte FormInput(void)
 
     GButton(bW1, 21, 16, GDISP, 2, paB);
 
-#ifdef PERF_TEST
-    for (i = 0; i < 100; i++) {
-    OS.color4 = i;
-#endif
     // Display fields as is
     WPrint(bW1, 8, 2, WOFF, cA);
     WPrint(bW1, 8, 3, WOFF, cB);
     WPrint(bW1, 8, 4, WOFF, cC);
     WPrint(bW1, 8, 5, WOFF, cD);
-#ifdef PERF_TEST
+
+    // ----- Performance Test Display Begin -----
+    // Open progress bar window
+    bW2 = WOpen(7, 10, 24, 4, WOFF);
+    WPrint(bW2, 2, 1, WOFF, "Timing:");
+
+    // Display initial progress bar
+    GProg(bW2, 2, 2, 0);
+
+    // Cycle border through 100 colors
+    for (bL = 0; bL < 100; bL++) {
+        // Change color and update progress bar
+        OS.color4 = bL;
+        GProg(bW2, 2, 2, bL);
     }
 
-    sprintf(cD, "%5d-------------------------------------", OS.rtclok[2] + OS.rtclok[1] * 256);
-    WPrint(bW1, 8, 5, WOFF, cD);
-#endif
+    // Reset border color
+    OS.color4 = 0;
+
+    // Close progress bar window
+    WClose(bW2);
+
+    // Display time it took to draw screen
+    sprintf(cT, "Jiffies: %5d", OS.rtclok[2] + OS.rtclok[1] * 256);
+    GAlert(cT);
+    // ----- Performance Test Display End -----
 
     // Loop until form accepted
     do {

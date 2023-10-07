@@ -13,7 +13,7 @@
 #define A8DEFINES_H
 
 // Version
-#define LIB_VERSION "1.2.0"
+#define LIB_VERSION "1.2.1"
 
 // True & False
 #ifndef TRUE

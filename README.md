@@ -15,6 +15,8 @@ Version 1.1 brought the addition of APE Time bindings to the library, which allo
 
 Version 1.2 brings the addition of FujiNet bindings to the library.  This consists of a core set of functions for communicating with the FujiNet (opening connections, reading from, writing to, and closing connections, etc).  It also includes Base64 encoding and decoding by means of the FujiNet, as well as hashing using SHA1, SHA256, and SHA512.  Offloading these compute intensive operations to the FujiNet, yet enabling the Atari to work with them!
 
+Version 1.21 brings performance improvements courtesy of @billkendrick.  Approximately 15% faster.  Performance test added to appdemo.c.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

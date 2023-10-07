@@ -34,6 +34,8 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS);
 byte WDiv(byte bN, byte y, byte bD);
 byte WClr(byte bN);
 
+unsigned int SCRMEM;
+unsigned int SCRMEM_row[24];
 
 // --------------------------------------------------
 // Function: void WInit(void)
@@ -59,19 +61,24 @@ void WInit(void)
     // Work on 10 window+system handles
     for(bL=0; bL < 11; bL++) {
         // Clear window handle record vars
-        baW[bL].bU = WOFF;
-        baW[bL].bX = 0;
-        baW[bL].bY = 0;
-        baW[bL].bW = 0;
-        baW[bL].bH = 0;
-        baW[bL].bI = WOFF;
-        baW[bL].cM = baWM;  // base storage location
-        baW[bL].cZ = 0;
+        baW.bU[bL] = WOFF;
+        baW.bX[bL] = 0;
+        baW.bY[bL] = 0;
+        baW.bW[bL] = 0;
+        baW.bH[bL] = 0;
+        baW.bI[bL] = WOFF;
+        baW.cM[bL] = baWM;  // base storage location
+        baW.cZ[bL] = 0;
     }
 
     // Set virtual cursor coords
     vCur.vX = 0;
     vCur.vY = 0;
+
+    SCRMEM = PEEKW(88);
+    for (bL = 0; bL < 24; bL++) {
+      SCRMEM_row[bL] = SCRMEM + (bL * 40);
+    }
 }
 
 
@@ -84,7 +91,7 @@ void WInit(void)
 void WBack(byte bN)
 {
     // Fill screen memory with char
-    memset((void *) PEEKW(RSCRN), bN, 960);
+    memset(SCRMEM, bN, 960);
 }
 
 
@@ -112,23 +119,23 @@ byte WOpen(byte x, byte y, byte w, byte h, byte bT)
     // Cycle through handles (exluding system)
     for(bL=0; bL <= 10; bL++) {
         // If handle is not in use
-        if (baW[bL].bU == WOFF) {
+        if (baW.bU[bL] == WOFF) {
             // Set handle in use
-            baW[bL].bU = WON;
+            baW.bU[bL] = WON;
 
             // Set storage address and size
-            baW[bL].cM = cpWM;
-            baW[bL].cZ = w * h;
+            baW.cM[bL] = cpWM;
+            baW.cZ[bL] = w * h;
 
             // Set other handle vars
-            baW[bL].bX = x;
-            baW[bL].bY = y;
-            baW[bL].bW = w;
-            baW[bL].bH = h;
-            baW[bL].bI = bT;
+            baW.bX[bL] = x;
+            baW.bY[bL] = y;
+            baW.bW[bL] = w;
+            baW.bH[bL] = h;
+            baW.bI[bL] = bT;
 
             // Find top left corner of window in memory
-            pS = PEEKW(RSCRN) + (y * 40) + x;
+            pS = SCRMEM_row[y] + x;
 
             // Draw window
             for(bD=0; bD <= h-1; bD++) {
@@ -202,38 +209,38 @@ byte WClose(byte bN)
     byte *pA;
 
     // Only if handle in use
-    if (baW[bN].bU == WON) {
+    if (baW.bU[bN] == WON) {
         // Find top left corner of window in screen memory
-        pS = PEEKW(RSCRN) + (baW[bN].bY * 40) + baW[bN].bX;
+        pS = SCRMEM_row[baW.bY[bN]] + baW.bX[bN];
 
         // Set temp ptr to start of win mem
-        pA = baW[bN].cM;
+        pA = baW.cM[bN];
 
         // Restore screen line by line
-        for (bL=0; bL <= baW[bN].bH-1; bL++) {
+        for (bL=0; bL <= baW.bH[bN]-1; bL++) {
             // Restore underlying screen
-            memcpy(pS, pA, baW[bN].bW);
+            memcpy(pS, pA, baW.bW[bN]);
             // Inc mem ptr index by width
-            pA += baW[bN].bW;
+            pA += baW.bW[bN];
             // Inc screen by 40 to next line
             pS += 40;
         }
 
         // Clear window memory
-        memset(baW[bN].cM, 0, baW[bN].cZ);
+        memset(baW.cM[bN], 0, baW.cZ[bN]);
 
         // Set win mem ptr to prev location
-        cpWM -= baW[bN].cZ;
+        cpWM -= baW.cZ[bN];
 
         // Clear handle
-        baW[bN].bU = WOFF;
-        baW[bN].bX = 0;
-        baW[bN].bY = 0;
-        baW[bN].bW = 0;
-        baW[bN].bH = 0;
-        baW[bN].bI = WOFF;
-        baW[bN].cM = baWM;  // point as base storage
-        baW[bN].cZ = 0;
+        baW.bU[bN] = WOFF;
+        baW.bX[bN] = 0;
+        baW.bY[bN] = 0;
+        baW.bW[bN] = 0;
+        baW.bH[bN] = 0;
+        baW.bI[bN] = WOFF;
+        baW.cM[bN] = baWM;  // point as base storage
+        baW.cZ[bN] = 0;
 
         // Set return
         bR = 0;
@@ -252,7 +259,7 @@ byte WClose(byte bN)
 // --------------------------------------------------
 byte WStat(byte bN)
 {
-    return(baW[bN].bU);
+    return(baW.bU[bN]);
 }
 
 
@@ -278,10 +285,10 @@ byte WPos(byte bN, byte x, byte y)
     // Window mode
     else {
         // Only if handle in use
-        if (baW[bN].bU == WON) {
+        if (baW.bU[bN] == WON) {
             // Set relative window pos
-            vCur.vX = baW[bN].bX + x;
-            vCur.vY = baW[bN].bY + y;
+            vCur.vX = baW.bX[bN] + x;
+            vCur.vY = baW.bY[bN] + y;
         }
     }
 
@@ -309,9 +316,9 @@ byte WPut(byte bN, byte x)
     bT = x;
 
     // Only if handle is used
-    if (baW[bN].bU == WON) {
+    if (baW.bU[bN] == WON) {
         // If window is inverse, flip string
-        if (baW[bN].bI == WON) {
+        if (baW.bI[bN] == WON) {
             bT ^= 128;
         }
 
@@ -349,7 +356,7 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
     unsigned char cL[129];
 
     // Only if handle is in use
-    if (baW[bN].bU == WON) {
+    if (baW.bU[bN] == WON) {
         // Copy string to line buffer
         strcpy(cL, pS);
         bL = strlen(cL);
@@ -359,9 +366,9 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
         // x is column offset.
         // width includes frames, remove 1
         // instead of 2 due to x as 1 based
-        if (bL > baW[bN].bW-x-1) {
+        if (bL > baW.bW[bN]-x-1) {
             // Add terminator, get new length
-            cL[baW[bN].bW-x-1] = '\0';
+            cL[baW.bW[bN]-x-1] = '\0';
             bL = strlen(cL);
         }
 
@@ -369,15 +376,12 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
         StrAI(cL, bL);
 
         // Make inverse if ON
-        if ((baW[bN].bI == WON) || (bI == WON)) {
+        if ((baW.bI[bN] == WON) || (bI == WON)) {
             StrInv(cL, bL);
         }
 
-        // Find top left corner of window in scrn mem (inside frame)
-        cS = PEEKW(RSCRN) + (baW[bN].bY*40) + baW[bN].bX;
-
-        // Add 40 for each row (Y)
-        cS += (y * 40);
+        // Find row, from top left corner of window, in scrn mem (inside frame)
+        cS = SCRMEM_row[baW.bY[bN] + y] + baW.bX[bN];
 
         // If not center, move to X pos
         if (x != WPCNT) {
@@ -386,7 +390,7 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
         }
         // Else move to centered position
         else {
-            cS += ((baW[bN].bW - bL)/2);
+            cS += ((baW.bW[bN] - bL)/2);
         }
 
         // Move line to screen
@@ -419,7 +423,7 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
     unsigned char cL[36];
 
     // Only if handle in use
-    if (baW[bN].bU == WON) {
+    if (baW.bU[bN] == WON) {
         // Create footer string
         sprintf(cL, "%c%s%c", 4, pS, 1);
         bS = strlen(cL);
@@ -428,7 +432,7 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
         StrAI(cL, bS);
 
         // If window inverse on, inverse all
-        if (baW[bN].bI == WON) {
+        if (baW.bI[bN] == WON) {
             StrInv(cL, bS);
         }
         // Else, just inverse title part
@@ -438,24 +442,24 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
         }
 
         // Find window top screen location
-        cS = PEEKW(RSCRN) + (baW[bN].bY * 40);
+        cS = SCRMEM_row[baW.bY[bN]];
 
         // If bottom find lower location
         if (bT == WPBOT) {
-            cS += ((baW[bN].bH - 1) * 40);
+            cS += ((baW.bH[bN] - 1) * 40);
         }
 
         // If left, add 1 (corner)
         if (bL == WPLFT) {
-            cS += baW[bN].bX + 1;
+            cS += baW.bX[bN] + 1;
         }
         // If right, add x + width - length - 1
         else if (bL == WPRGT) {
-            cS += baW[bN].bX + baW[bN].bW - bS - 1;
+            cS += baW.bX[bN] + baW.bW[bN] - bS - 1;
         }
         // Else center
         else {
-            cS += baW[bN].bX + ((baW[bN].bW - bS) / 2);
+            cS += baW.bX[bN] + ((baW.bW[bN] - bS) / 2);
         }
 
         // Move ornament to screen
@@ -487,9 +491,9 @@ byte WDiv(byte bN, byte y, byte bD)
     unsigned char cL[41];
 
     // Only if window open
-    if (baW[bN].bU == WON) {
+    if (baW.bU[bN] == WON) {
         // Get window width
-        bS = baW[bN].bW;
+        bS = baW.bW[bN];
 
         // Create divider string
 
@@ -508,14 +512,14 @@ byte WDiv(byte bN, byte y, byte bD)
         }
 
         // If inverse flag, flip line
-        if (baW[bN].bI == WON) {
+        if (baW.bI[bN] == WON) {
             for (bL=0; bL <= bS-1; bL++) {
                 cL[bL] ^= 128;
             }
         }
 
         // Find location on screen
-        cS = PEEKW(RSCRN) + ((baW[bN].bY + y) * 40) + baW[bN].bX;
+        cS = SCRMEM_row[baW.bY[bN] + y] + baW.bX[bN];
 
         // Move to screen
         memcpy(cS, cL, bS);
@@ -543,23 +547,23 @@ byte WClr(byte bN)
     unsigned char cL[38];
 
     // Only if window in use
-    if (baW[bN].bU == WON) {
+    if (baW.bU[bN] == WON) {
         // Find top left corner of window in screen memory (inside frame)
-        cS = PEEKW(RSCRN) + (baW[bN].bY * 40) + baW[bN].bX + 41;
+        cS = SCRMEM_row[baW.bY[bN]] + baW.bX[bN] + 41;
 
         // Determine width (minus frames)
-        bS = baW[bN].bW - 2;
+        bS = baW.bW[bN] - 2;
 
         // Set blank line
         memset(cL, 0, bS);
 
         // If window is inverse, flip line
-        if (baW[bN].bI == WON) {
+        if (baW.bI[bN] == WON) {
             StrInv(cL, bS);
         }
 
         // Clear window line by line
-        for (bL=1; bL <= baW[bN].bH - 2; bL++) {
+        for (bL=1; bL <= baW.bH[bN] - 2; bL++) {
             memcpy(cS, cL, bS);
             cS += 40;
         }

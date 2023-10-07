@@ -53,21 +53,25 @@ void StrInv(unsigned char *pS, byte bS)
 // ------------------------------------------------------------
 void StrAI(unsigned char *pS, byte bS)
 {
-    byte bL;
+    byte bL, bH;
 
     // Process each element
     for (bL=0; bL < bS; bL++) {
-        if ((*(pS) >= 0) && (*(pS) <= 31)) {
-            *(pS) += 64;
+        if (*(pS) < 128) {
+            if (*(pS) < 32) {
+                *(pS) += 64;
+            }
+            else if (*(pS) < 96) {
+                *(pS) -= 32;
+            }
         }
-        else if ((*(pS) >= 32) && (*(pS) <= 95)) {
-            *(pS) -= 32;
-        }
-        else if ((*(pS) >= 128) && (*(pS) <= 159)) {
-            *(pS) += 64;
-        }
-        else if ((*(pS) >= 160) && (*(pS) <= 223)) {
-            *(pS) -= 32;
+        else {
+            if (*(pS) < 160) {
+                *(pS) += 64;
+            }
+            else if (*(pS) < 224) {
+                *(pS) -= 32;
+            }
         }
 
         // Increment pointer to next char
@@ -90,10 +94,10 @@ void StrIA(unsigned char *pS, byte bS)
 
     // Process each element
     for (bL=0; bL < bS; bL++) {
-        if ((*(pS) >= 0) && (*(pS) <= 63)) {
+        if (*(pS) < 64) {
             *(pS) += 32;
         }
-        else if ((*(pS) >= 64) && (*(pS) <= 95)) {
+        else if (*(pS) <= 96) {
             *(pS) -= 64;
         }
         else if ((*(pS) >= 128) && (*(pS) <= 154)) {
@@ -110,3 +114,4 @@ void StrIA(unsigned char *pS, byte bS)
         *pS++;
     }
 }
+

@@ -15,7 +15,7 @@
 
 // Window handle info
 typedef struct {
-    unsigned char bU[NUM_WIN],bX[NUM_WIN],bY[NUM_WIN],bW[NUM_WIN],bH[NUM_WIN],bI[NUM_WIN];
+    unsigned char bU[NUM_WIN],bX[NUM_WIN],bY[NUM_WIN],bW[NUM_WIN],bH[NUM_WIN],bI[NUM_WIN],bB[NUM_WIN];
     unsigned char *cM[NUM_WIN];
     unsigned int cZ[NUM_WIN];
 } td_wnrec;

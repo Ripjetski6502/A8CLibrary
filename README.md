@@ -17,6 +17,8 @@ Version 1.2 brings the addition of FujiNet bindings to the library.  This consis
 
 Version 1.21 brings performance improvements courtesy of @billkendrick.  Approximately 15% faster.  Performance test added to appdemo.c.
 
+Version 1.30 brings borderless / frameless window support, minor bug fix in WPrint(), and a reworked Menu() function that adds horizontal (single line) menu bars.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

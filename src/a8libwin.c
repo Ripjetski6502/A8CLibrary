@@ -8,7 +8,7 @@
 //          -Converted from Action!
 //          -Type byte is synonymous with unsigned char (a8defines.h)
 // Depends: a8libstr.c
-// Revised:
+// Revised: 2024.02-Added borderless window support.
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -24,7 +24,7 @@
 // --------------------------------------------------
 void WInit(void);
 void WBack(byte bN);
-byte WOpen(byte x, byte y, byte w, byte h, byte bT);
+byte WOpen(byte x, byte y, byte w, byte h, byte bT, byte bB);
 byte WClose(byte bN);
 byte WStat(byte bN);
 byte WPos(byte bN, byte x, byte y);
@@ -67,6 +67,7 @@ void WInit(void)
         baW.bW[bL] = 0;
         baW.bH[bL] = 0;
         baW.bI[bL] = WOFF;
+        baW.bB[bL] = WOFF;
         baW.cM[bL] = baWM;  // base storage location
         baW.cZ[bL] = 0;
     }
@@ -96,7 +97,7 @@ void WBack(byte bN)
 
 
 // --------------------------------------------------
-// Function: byte WOpen(byte x, byte y, byte w, byte h, byte bT)
+// Function: byte WOpen(byte x, byte y, byte w, byte h, byte bT, byte b)
 // Desc....: Open a window
 // Param...: x = column
 //           y = row
@@ -104,12 +105,14 @@ void WBack(byte bN)
 //           h = height
 //           bT = display in inverse
 //                WON/WOFF
+//           b = border flag
+//               WON/WOFF
 // Returns.: Window handle number
 //           > 100 on error
 // Notes...: cL is not manipulated as a string.
 //           (0) is data, not size.
 // --------------------------------------------------
-byte WOpen(byte x, byte y, byte w, byte h, byte bT)
+byte WOpen(byte x, byte y, byte w, byte h, byte bT, byte b)
 {
     byte bR = WENONE;
     byte bL, bD, bC;
@@ -133,6 +136,7 @@ byte WOpen(byte x, byte y, byte w, byte h, byte bT)
             baW.bW[bL] = w;
             baW.bH[bL] = h;
             baW.bI[bL] = bT;
+            baW.bB[bL] = b;
 
             // Find top left corner of window in memory
             pS = iSMr[y] + x;
@@ -140,29 +144,33 @@ byte WOpen(byte x, byte y, byte w, byte h, byte bT)
             // Draw window
             for(bD=0; bD <= h-1; bD++) {
                 // Build window line as string (internal char codes)
+                memset(cL, 0, w);
 
-                // If top or bottom line ("+-+")
-                if ((bD == 0) || (bD == h-1)) {
-                    // Set solid line
-                    memset(cL, 82, w);
+                // If borders are on, define them
+                if (b == WON) {
+                    // If top or bottom line ("+-+")
+                    if ((bD == 0) || (bD == h-1)) {
+                        // Set solid line
+                        memset(cL, 82, w);
 
-                    // Top line corners
-                    if (bD == 0) {
-                        cL[0] = 81;
-                        cL[w-1] = 69;
-                    }
-                    // Bottom line corners
+                        // Top line corners
+                        if (bD == 0) {
+                            cL[0] = 81;
+                            cL[w-1] = 69;
+                        }
+                        // Bottom line corners
+                        else {
+                            cL[0] = 90;
+                            cL[w-1] = 67;
+                        }
+                        }
+                    // Middle line "| |"
                     else {
-                        cL[0] = 90;
-                        cL[w-1] = 67;
+                        // Set space and sides
+                        memset(cL, 0, w);
+                        cL[0] = 124;
+                        cL[w-1] = 124;
                     }
-                }
-                // Middle line "| |"
-                else {
-                    // Set space and sides
-                    memset(cL, 0, w);
-                    cL[0] = 124;
-                    cL[w-1] = 124;
                 }
 
                 // If inverse flag, flip line
@@ -239,6 +247,7 @@ byte WClose(byte bN)
         baW.bW[bN] = 0;
         baW.bH[bN] = 0;
         baW.bI[bN] = WOFF;
+        baW.bB[bN] = WOFF;
         baW.cM[bN] = baWM;  // point as base storage
         baW.cZ[bN] = 0;
 
@@ -317,7 +326,7 @@ byte WPut(byte bN, byte x)
 
     // Only if handle is used
     if (baW.bU[bN] == WON) {
-        // If window is inverse, flip string
+        // If window is inverse, flip byte
         if (baW.bI[bN] == WON) {
             bT ^= 128;
         }
@@ -362,21 +371,20 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
         bL = strlen(cL);
 
         // Ensure text wont overrun
-        // Check len not > width-x-1.
-        // x is column offset.
-        // width includes frames, remove 1
-        // instead of 2 due to x as 1 based
-        if (bL > baW.bW[bN]-x-1) {
+        // Check len not > width-(x-1)-2 (if frames on),
+        // or len not > width-(x-1) (if frames off).
+        // x is column, -1 for 0 based.
+        if (bL > baW.bW[bN] - (x-1) - (baW.bB[bN] == WON ? 2 : 0)) {
             // Add terminator, get new length
-            cL[baW.bW[bN]-x-1] = '\0';
+            cL[baW.bW[bN] - (x-1) - (baW.bB[bN] == WON ? 2 : 0)] = '\0';
             bL = strlen(cL);
         }
 
         // Convert from ATA to Int
         StrAI(cL, bL);
 
-        // Make inverse if ON
-        if ((baW.bI[bN] == WON) || (bI == WON)) {
+        // Make inverse if asked
+        if (bI == WON) {
             StrInv(cL, bL);
         }
 
@@ -479,7 +487,6 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
 // Param...: bN = window handle number
 //            y = Which row for divider
 //           bD = Display On/Off flag
-//           pS = Text string pointer
 // Returns.: 0 if success
 //           >100 on error
 // --------------------------------------------------
@@ -501,14 +508,22 @@ byte WDiv(byte bN, byte y, byte bD)
         if (bD == WON) {
             // Set solid line
             memset(cL, 82, bS);
-            cL[0] = 65;
-            cL[bS-1] = 68;
+
+            // If borders are on, set them to intersect
+            if (baW.bB[bN] == WON) {
+                cL[0] = 65;
+                cL[bS-1] = 68;
+            }
         }
         else {
             // Set blank line
             memset(cL, 0, bS);
-            cL[0] = 124;
-            cL[bS-1] = 124;
+
+            // If borders are on, set them to not intersect
+            if (baW.bB[bN] == WON) {
+                cL[0] = 124;
+                cL[bS-1] = 124;
+            }
         }
 
         // If inverse flag, flip line

@@ -57,7 +57,7 @@ void GAlert(unsigned char *pS)
     x = ((38 - bL) / 2);
 
     // Show window
-    bW = WOpen(x, 10, bL+2, 5, WOFF);
+    bW = WOpen(x, 10, bL+2, 5, WOFF, WON);
     WOrn(bW, WPTOP, WPCNT, "Alert!");
     WPrint(bW, WPCNT, 1, WOFF, pS);
     WPrint(bW, WPCNT, 3, WON, " OK ");

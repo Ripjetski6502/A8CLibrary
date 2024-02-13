@@ -53,7 +53,7 @@ void StrInv(unsigned char *pS, byte bS)
 // ------------------------------------------------------------
 void StrAI(unsigned char *pS, byte bS)
 {
-    byte bL, bH;
+    byte bL;
 
     // Process each element
     for (bL=0; bL < bS; bL++) {
@@ -114,4 +114,3 @@ void StrIA(unsigned char *pS, byte bS)
         *pS++;
     }
 }
-

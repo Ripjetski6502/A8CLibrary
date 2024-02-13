@@ -13,7 +13,7 @@
 #define A8DEFINES_H
 
 // Version
-#define LIB_VERSION "1.2.1"
+#define LIB_VERSION "1.3.0"
 
 // True & False
 #ifndef TRUE
@@ -64,35 +64,6 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define XESC  253
 #define XTAB  254
 #define XNONE 255
-
-// OS Registers
-#define DMACTL 559
-#define COLDST 580
-#define GPRIOR 623
-#define INVFLG 694
-#define SHFLOK 702
-#define HELPFG 732
-#define KEYPCH 764
-#define GRACTL 53277U
-#define CONSOL 53279U
-#define PMBASE 54279U
-
-// PM Registers
-#define HPOSP0 53248U
-#define HPOSP1 53249U
-#define HPOSP2 53250U
-
-// Screen Bits
-#define ALMARG 82
-#define RSCRN  88
-#define PCOLR0 704
-#define PCOLR1 705
-#define PCOLR2 706
-#define PCOLR3 707
-#define AFOREG 709
-#define ABACKG 710
-#define ABORDR 712
-#define ACURIN 752
 
 // Colors
 #define CBLACK  0
@@ -160,6 +131,8 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define CHTPRGT 5
 #define CHTPLFT 17
 #define CHBTLFT 26
+#define CHHBAR  18
+#define CHVBAR  124
 #define CHBALL  20
 #define CHESC   27
 #define CHUP    28
@@ -184,5 +157,69 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define DCBREAD  0x40
 #define DCBWRITE 0x80
 #define DCBRW    0xC0
+
+// ----- OS Registers for PEEK (lib dependencies) -----
+#define ALMARG 82
+#define RSCRN  88
+#define INVFLG 694
+#define SHFLOK 702
+#define HELPFG 732
+#define ACURIN 752
+#define KEYPCH 764
+#define CONSOL 53279U
+
+// ----- OS Registers -----
+#define APPMHI *((word *) 0x000E)
+#define RTCLOK *((byte *) 0x0012)
+#define RTC2   *((byte *) 0x0013)
+#define RTC3   *((byte *) 0x0014)
+#define ATRACT *((byte *) 0x004D)
+#define SAVMSC *((word *) 0x0058)
+#define RAMTOP *((byte *) 0x006A)
+#define FR0    *((word *) 0x00D4)
+#define SDMCTL *((byte *) 0x022F)
+#define SDLSTL *((word *) 0x0230)
+#define GPRIOR *((byte *) 0x026F)
+#define STICK0 *((byte *) 0x0278)
+#define STRIG0 *((byte *) 0x0284)
+#define COLOR0 *((byte *) 0x02C4)
+#define COLOR1 *((byte *) 0x02C5)
+#define COLOR2 *((byte *) 0x02C6)
+#define COLOR3 *((byte *) 0x02C7)
+#define COLBK  *((byte *) 0x02C8)
+#define RAMSIZ *((byte *) 0x02E4)
+#define MEMTOP *((byte *) 0x02E5)
+#define CHBAS  *((word *) 0x02F4)
+#define HPOSP0 *((byte *) 0xD000)
+#define HPOSP1 *((byte *) 0xD001)
+#define HPOSP2 *((byte *) 0xD002)
+#define HPOSP3 *((byte *) 0xD003)
+#define HPOSM0 *((byte *) 0xD004)
+#define HPOSM1 *((byte *) 0xD005)
+#define HPOSM2 *((byte *) 0xD006)
+#define HPOSM3 *((byte *) 0xD007)
+#define SIZEP0 *((byte *) 0xD008)
+#define SIZEP1 *((byte *) 0xD009)
+#define SIZEP2 *((byte *) 0xD00A)
+#define SIZEP3 *((byte *) 0xD00B)
+#define SIZEM  *((byte *) 0xD00C)
+#define GRAFP0 *((byte *) 0xD00D)
+#define GRAFP1 *((byte *) 0xD00E)
+#define GRAFP2 *((byte *) 0xD00F)
+#define GRAFP3 *((byte *) 0xD010)
+#define GRAFM  *((byte *) 0xD011)
+#define PCOLR0 *((byte *) 0xD012)
+#define PCOLR1 *((byte *) 0xD013)
+#define PCOLR2 *((byte *) 0xD014)
+#define PCOLR3 *((byte *) 0xD015)
+#define GRACTL *((byte *) 0xD01D)
+#define HITCLR *((byte *) 0xD01E)
+#define RANDOM *((byte *) 0xD20A)
+#define DMACTL *((byte *) 0xD400)
+#define DLISTL *((word *) 0xD402)
+#define PMBASE *((word *) 0xD407)
+#define WSYNC  *((byte *) 0xD40A)
+#define VCOUNT *((byte *) 0xD40B)
+#define NMIEN  *((byte *) 0xD40E)
 
 #endif

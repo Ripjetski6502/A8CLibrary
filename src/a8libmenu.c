@@ -20,24 +20,33 @@
 
 
 // --------------------------------------------------
+// Defines to preserve backward call compatability.
+// --------------------------------------------------
+#define MenuV(a,b,c,d,e,f,g) Menu(a,b,c,GVERT,d,e,f,g)
+
+
+// --------------------------------------------------
 // Function Prototypes
 // --------------------------------------------------
-byte MenuV(byte bN, byte x, byte y, byte bI, byte bS, byte bC, unsigned char **pS);
+byte Menu(byte bN, byte x, byte y, byte bO, byte bI, byte bS, byte bC, unsigned char **pS);
 
 
 // ------------------------------------------------------------
-// Func...: byte MenuV(byte bN, byte x, byte y, byte bI, byte bS, byte bC, unsigned char **pS)
+// Func...: byte Menu(byte bN, byte x, byte y, byte bO, byte bI, byte bS, byte bC, unsigned char **pS)
 // Desc...: Vertical menu
 // Param..: bN = Window handle number
 //           x = window column for cursor
 //           y = window row for cursor
+//          bO = Orientation
+//               GHORZ = Horizontal (1 line)
+//               GVERT = Vertical   (stacked)
 //          bI = Inverse flag (WON = leave on at selection)
 //          bS = Start item number
 //          bC = Number of menu items
 //          pS = pointer to array of menu item strings
 // Return.: Selected item #, ESC (XESC), or TAB (XTAB)
 // ------------------------------------------------------------
-byte MenuV(byte bN, byte x, byte y, byte bI, byte bS, byte bC, unsigned char **pS)
+byte Menu(byte bN, byte x, byte y, byte bO, byte bI, byte bS, byte bC, unsigned char **pS)
 {
     byte bF = FALSE;
     byte bL, bR, bK;
@@ -52,8 +61,14 @@ byte MenuV(byte bN, byte x, byte y, byte bI, byte bS, byte bC, unsigned char **p
         for (bL=0; bL<bC; bL++) {
             strcpy(cL, pS[bL]);
 
-            // Display item at row count - inverse if start item
-            WPrint(bN, x, y+bL, (bL+1 == bR ? WON : WOFF), cL);
+            // Highlight selection based on orientation
+            if (bO == GHORZ) {
+                // Display item at row count - inverse if start item
+                WPrint(bN, x+(bL*strlen(cL)), y, (bL+1 == bR ? ! baW.bI[bN] : baW.bI[bN]), cL);
+            } else {
+                // Display item at row count - inverse if start item
+                WPrint(bN, x, y+bL, (bL+1 == bR ? WON : WOFF), cL);
+            }
         }
 
         // Get key (no inverse key)
@@ -101,7 +116,13 @@ byte MenuV(byte bN, byte x, byte y, byte bI, byte bS, byte bC, unsigned char **p
     // Uninverse last selection if needed
     if (bI == WOFF) {
         strcpy(cL, pS[bL-1]);
-        WPrint(bN, x, y+bL-1, WOFF, cL);
+
+        // Unhighlight selection based on orientation
+        if (bO == GHORZ) {
+            WPrint(bN, x+bL-1, y, WOFF, cL);
+        } else {
+            WPrint(bN, x, y+bL-1, WOFF, cL);
+        }
     }
 
     return(bR);

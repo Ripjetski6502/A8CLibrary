@@ -19,6 +19,8 @@ Version 1.21 brings performance improvements courtesy of @billkendrick.  Approxi
 
 Version 1.30 brings borderless / frameless window support, minor bug fix in WPrint(), and a reworked Menu() function that adds support for horizontal (single line) menu bars.
 
+Version 1.40 brings GList() which is a list selection input control.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

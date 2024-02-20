@@ -23,6 +23,10 @@ Version 1.40 brings GList() which is a list selection input control.
 
 Version 1.42 brings fix to GList() navigation to make more sense, adding GUPPER to GInput() to force uppercase text, and adds remaining A-Z keycodes in primary header file.
 
+Version 1.43 brings fix to Menu() selected item de-highlight placement at exit when used in horizontal orientation.
+
+Version 1.44 brings GLOWER to GInput() to force lowercase text, and GFNAME to GInput() to force uppercase and only allow valid filename characters.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

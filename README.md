@@ -21,6 +21,8 @@ Version 1.30 brings borderless / frameless window support, minor bug fix in WPri
 
 Version 1.40 brings GList() which is a list selection input control.
 
+Version 1.42 brings fix ti GList() navigation to make more sense, adding GUPPER to GInput() to force uppercase text, and adds remaining A-Z keycodes in primary header file.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

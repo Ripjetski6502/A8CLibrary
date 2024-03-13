@@ -27,6 +27,8 @@ Version 1.43 brings fix to Menu() selected item de-highlight placement at exit w
 
 Version 1.44 brings GLOWER to GInput() to force lowercase text, and GFNAME to GInput() to force uppercase and only allow valid filename characters.
 
+Version 1.45 brings GStat() function to display simple non-interactive status windows for short program operations.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

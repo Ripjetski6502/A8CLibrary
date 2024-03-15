@@ -29,6 +29,8 @@ Version 1.44 brings GLOWER to GInput() to force lowercase text, and GFNAME to GI
 
 Version 1.45 brings GStat() function to display simple non-interactive status windows for short program operations.
 
+Version 1.46 brings A8LibDOS, which includes the function SDGDate().  SDGDate() retrieves the date and time from the SpartaDOS COMTAB table, which is independent of the actual real time clock being used.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

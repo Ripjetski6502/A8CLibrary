@@ -17,6 +17,25 @@
 
 
 // ------------------------------------------------------------
+// Func...: byte IsSD(void)
+// Desc...: Determines if SpartaDOS is present
+// Returns: TRUE or FALSE
+// ------------------------------------------------------------
+byte IsSD(void)
+{
+    byte bR = FALSE;
+    byte bP = DOSID;
+
+    // Check DOSID for one of 4 bytes indicating SpartaDOS
+    if ((bP == 0) || (bP == 15) || (bP == 68) || (bP ==89)) {
+        bR = TRUE;
+    }
+
+    return (bR);
+}
+
+
+// ------------------------------------------------------------
 // Func...: void SDGDate(unsigned char *bD)
 // Desc...: Gets date and time from SpartaDOS
 // Returns: void

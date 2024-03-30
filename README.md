@@ -31,6 +31,8 @@ Version 1.45 brings GStat() function to display simple non-interactive status wi
 
 Version 1.46 brings A8LibDOS, which includes the function SDGDate().  SDGDate() retrieves the date and time from the SpartaDOS COMTAB table, which is independent of the actual real time clock being used.
 
+Version 1.47 brings IsSD() to A8LibDOS, which detects and returns if SpartaDOS is present or not.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

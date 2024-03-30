@@ -15,6 +15,9 @@
 // Definitions
 // --------------------------------------------------
 
+// Locations
+#define DOSID *((word *) 0x0F31)
+
 // Date/Time function buffer elements
 #define ASD_DT_DY  0
 #define ASD_DT_MO  1
@@ -27,6 +30,7 @@
 // --------------------------------------------------
 // Function Prototypes
 // --------------------------------------------------
+unsigned char IsSD(void);
 void SDGDate(unsigned char *bD);
 
 #endif

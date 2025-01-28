@@ -9,6 +9,8 @@
 //          -Type byte is synonymous with unsigned char (a8defines.h)
 // Depends: a8libstr.c
 // Revised: 2024.02-Added borderless window support.
+//          2025.01-Alter WClr to allow specifying top and bottom row.
+//                  Renamed to WClrRw.
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -17,6 +19,12 @@
 #include <peekpoke.h>
 #include "a8defines.h"
 #include "a8defwin.h"
+
+
+// --------------------------------------------------
+// Defines to preserve backward call compatability.
+// --------------------------------------------------
+#define WClr(a) WClrRw(a,WPTOP,WPBOT)
 
 
 // --------------------------------------------------
@@ -32,7 +40,7 @@ byte WPut(byte bN, byte x);
 byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS);
 byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS);
 byte WDiv(byte bN, byte y, byte bD);
-byte WClr(byte bN);
+byte WClrRw(byte bN, byte bT, byte bB);
 
 unsigned int iSM;
 unsigned int iSMr[24];
@@ -93,7 +101,7 @@ void WInit(void)
 void WBack(byte bN)
 {
     // Fill screen memory with char
-    memset(iSM, bN, 960);
+    memset((char *) iSM, bN, 960);
 }
 
 
@@ -182,11 +190,11 @@ byte WOpen(byte x, byte y, byte w, byte h, byte bT, byte b)
                 }
 
                 // Save underlying screen to win mem
-                memcpy(cpWM, pS, w);
+                memcpy((char *) cpWM, (char *) pS, w);
                 // Inc mem ptr index by win width
                 cpWM += w;
                 // Move line to screen
-                memcpy(pS, cL, w);
+                memcpy((char *) pS, cL, w);
                 // Inc screen by 40 to next line start
                 pS += 40;
             }
@@ -228,7 +236,7 @@ byte WClose(byte bN)
         // Restore screen line by line
         for (bL=0; bL <= baW.bH[bN]-1; bL++) {
             // Restore underlying screen
-            memcpy(pS, pA, baW.bW[bN]);
+            memcpy((char *) pS, pA, baW.bW[bN]);
             // Inc mem ptr index by width
             pA += baW.bW[bN];
             // Inc screen by 40 to next line
@@ -403,7 +411,7 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
         }
 
         // Move line to screen
-        memcpy(cS, cL, bL);
+        memcpy((char *) cS, cL, bL);
 
         // Set valid return
         bR = 0;
@@ -417,7 +425,7 @@ byte WPrint(byte bN, byte x, byte y, byte bI, unsigned char *pS)
 // Function: byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
 // Desc....: Add ornament decor to window
 // Param...: bN = window handle number
-//           bT = Top or bottom (WPTOP/WPBOT)
+//           bT = Top or bottom (WPTOP/WPBOT/1-23)
 //           bL = Position (WPLFT/WPRGT/WPCNT)
 //           pS = Text string pointer
 // Returns.: 0 if success
@@ -456,6 +464,11 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
         // If bottom find lower location
         if (bT == WPBOT) {
             cS += ((baW.bH[bN] - 1) * 40);
+        } else {
+            // If absolute row specified, place there (expecting DIV row)
+            if ((bT > 0) && (bT < 23)) {
+                cS += (bT * 40);
+            }
         }
 
         // If left, add 1 (corner)
@@ -472,7 +485,7 @@ byte WOrn(byte bN, byte bT, byte bL, unsigned char *pS)
         }
 
         // Move ornament to screen
-        memcpy(cS, cL, bS);
+        memcpy((char *) cS, cL, bS);
 
         // Set valid return
         bR = 0;
@@ -538,7 +551,7 @@ byte WDiv(byte bN, byte y, byte bD)
         cS = iSMr[baW.bY[bN] + y] + baW.bX[bN];
 
         // Move to screen
-        memcpy(cS, cL, bS);
+        memcpy((char *) cS, cL, bS);
 
         // Set valid return
         bR = 0;
@@ -549,16 +562,20 @@ byte WDiv(byte bN, byte y, byte bD)
 
 
 // --------------------------------------------------
-// Function: byte WClr(byte bN)
+// Function: byte WClrRw(byte bN, byte bT, byte bB)
 // Desc....: Clears window contents
 // Param...: bN = window handle number
+//           bT = top row to clear
+//                WPTOP for default (row 1)
+//           bB = bottom row to clear
+//                WPBOT for default (last row before bottom border)
 // Returns.: 0 if success
 //           >100 on error
 // --------------------------------------------------
-byte WClr(byte bN)
+byte WClrRw(byte bN, byte bT, byte bB)
 {
     byte bR = WENOPN;
-    byte bL, bS;
+    byte bL, bS, bC, bD;
     word cS;
     unsigned char cL[38];
 
@@ -578,9 +595,24 @@ byte WClr(byte bN)
             StrInv(cL, bS);
         }
 
+        // If top specified as default, set to 1, else set to passed value
+        if (bT == WPTOP) {
+            bC = 1;
+        } else {
+            bC = bT;
+            cS += ((bT - 1) * 40);
+        }
+
+        // If bottom specified as default, set to last row, else set to passed value
+        if (bB == WPBOT) {
+            bD = baW.bH[bN] - 2;
+        } else {
+            bD = bB;
+        }
+
         // Clear window line by line
-        for (bL=1; bL <= baW.bH[bN] - 2; bL++) {
-            memcpy(cS, cL, bS);
+        for (bL=bC; bL <= bD; bL++) {
+            memcpy((char *) cS, cL, bS);
             cS += 40;
         }
 

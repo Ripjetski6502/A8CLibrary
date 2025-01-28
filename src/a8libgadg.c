@@ -19,6 +19,9 @@
 //          2024.02.18-Added GUPPER to GInput().
 //          2024.02.20-Changed GList navigation to make more sense.
 //          2024.03.12-Added GStat().
+//          2025.01.03-Added GConf(), mod GAlert title.
+//          2025.01.05-Fix GInput FNAME to allow 0 and space.
+//          2025.01.11-Alter GAlert to GAlertM.
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -28,9 +31,15 @@
 
 
 // --------------------------------------------------
+// Defines to preserve backward call compatability.
+// --------------------------------------------------
+#define GAlert(a) GAlertM(GAALERT,a)
+
+// --------------------------------------------------
 // Function Prototypes
 // --------------------------------------------------
-void GAlert(unsigned char *pS);
+void GAlertM(byte bT, unsigned char *pS);
+byte GConf(unsigned char *pS);
 void GStat(byte bT, unsigned char *pS);
 void GProg(byte bN, byte x, byte y, byte bS);
 byte GButton(byte bN, byte x, byte y, byte bD, byte bS, unsigned char **pA);
@@ -42,34 +51,50 @@ byte GList(byte bN, byte x, byte y, byte bE, byte bS, byte bM, byte bC, unsigned
 
 
 // ------------------------------------------------------------
-// Func...: void GAlert(unsigned char *pS)
+// Func...: void GAlertM(byte bT, unsigned char *pS)
 // Desc...: Displays centered alert on screen
-// Param..: pS = Message string
+// Param..: bT = Type of message to display
+//
+//          pS = Message string
 // Notes..: 38 characters max
 // ------------------------------------------------------------
-void GAlert(unsigned char *pS)
+void GAlertM(byte bT, unsigned char *pS)
 {
-    byte bW, bL, x;
+    byte bW, bL, bR;
+    word bK;
+    unsigned char cL[11];
+
+    // Determine ornament type
+    switch (bT) {
+        case GAALERT : strcpy(cL, " Alert! ");
+                       break;
+        case GAINFO  : strcpy(cL, " Info ");
+                       break;
+        case GAWARN  : strcpy(cL, " Warning! ");
+                       break;
+        case GAERR   : strcpy(cL, " Error! ");
+                       break;
+    }
 
     // Find string length
-    bL = strlen(pS);
+    bR = strlen(pS);
 
     // Ensure min window width met
-    if (bL < 8) {
-        bL = 8;
+    if (bR < 12) {
+        bR = 12;
     }
 
     // Find left window position
-    x = ((38 - bL) / 2);
+    bL = ((38 - bR) / 2);
 
     // Show window
-    bW = WOpen(x, 10, bL+2, 5, WOFF, WON);
-    WOrn(bW, WPTOP, WPCNT, "Alert!");
+    bW = WOpen(bL, 10, bR + 2, 5, WOFF, WON);
+    WOrn(bW, WPTOP, WPCNT, cL);
     WPrint(bW, WPCNT, 1, WOFF, pS);
     WPrint(bW, WPCNT, 3, WON, " OK ");
 
     // Wait for key
-    x = WaitKCX(WOFF);
+    bK = WaitKCX(WOFF);
 
     // Close window
     WClose(bW);
@@ -77,9 +102,48 @@ void GAlert(unsigned char *pS)
 
 
 // ------------------------------------------------------------
+// Func...: byte GConf(unsigned char *pS)
+// Desc...: Displays message and gets confirmation
+// Params.: pS = Message string
+// Returns: Button number choice (1 = GCYES, 2 = GCNO)
+// Notes..: 38 characters max
+// ------------------------------------------------------------
+byte GConf(unsigned char *pS)
+{
+    byte bW, bL, bR;
+    unsigned char *paB[3] = { "[ Yes ]", "[ No ]" };
+
+    // Find string length
+    bR = strlen(pS);
+
+    // Ensure min window width met
+    if (bR < 14) {
+        bR = 14;
+    }
+
+    // Find left window position
+    bL = ((38 - bR) / 2);
+
+    // Show window
+    bW = WOpen(bL, 8, bR + 2, 8, WOFF, WON);
+    WOrn(bW, WPTOP, WPCNT, " Confirm ");
+    WPrint(bW, WPCNT, 2, WOFF, pS);
+    WPrint(bW, 1, 4, WOFF, "Are you sure?");
+
+    // Show buttons
+    bR = GButton(bW, bR - 12, 6, GEDIT, 2, paB);
+
+    // Close window
+    WClose(bW);
+
+    return(bR);
+}
+
+
+// ------------------------------------------------------------
 // Func...: void GStat(byte bT, unsigned char *pS)
 // Desc...: Displays a simple presized status window.
-// Param..: bT = Open/Close flag
+// Params.: bT = Open/Close flag
 //               WON = Open (turn on)
 //               WOFF = Close (turn off)
 //          pS = String to display (28 char limit)
@@ -138,6 +202,7 @@ void GProg(byte bN, byte x, byte y, byte bS)
 //          bD = Initial selected button (0 to display and exit)
 //          bS = Number of buttons
 //          pS = Array of button strings
+// Returns: button number choice (1 based) or XESC,XTAB
 // Notes..: Button ornaments should be defined in strings.
 //          Max length of all buttons is 38.
 // ------------------------------------------------------------
@@ -250,7 +315,7 @@ byte GCheck(byte bN, byte x, byte y, byte bI, byte bD)
                 bR = bC;
                 bF = TRUE;
             }
-            else if ((bK == KSPACE) || (bK == KX) || (bK == KX_S)) {
+            else if ((bK == KSPACE) || (bK == KEYX) || (bK == KEYX_S)) {
                 // Toggle value
                 bC = (bC == GCON ? GCOFF : GCON);
                 bR = bC;
@@ -385,6 +450,7 @@ byte GRadio(byte bN, byte x, byte y, byte bD, byte bE, byte bI, byte bS, unsigne
 //          bM = Max allowed value
 //          bI = Initial value
 //          bE = GDISP to display only, GEDIT to edit
+// Return.: selected value or XESC
 // Notes..: Max is 250 (above are form control values)
 // ------------------------------------------------------------
 byte GSpin(byte bN, byte x, byte y, byte bL, byte bM, byte bI, byte bE)
@@ -508,11 +574,11 @@ byte GInput(byte bN, byte x, byte y, byte bT, byte bS, unsigned char *pS)
             bE -= (bE == 0 ? 0 : 1);
         }
         // Is internal code Ctrl-Shft-S (start of string)?
-        else if (bK == KS_CS) {
+        else if (bK == KEYS_CS) {
             bE = 0;
         }
         // Is internal code Ctrl-Shft-E (end of string)?
-        else if (bK == KE_CS) {
+        else if (bK == KEYE_CS) {
             bE = bZ;
         }
         // Is internal code DEL?
@@ -629,16 +695,16 @@ byte GInput(byte bN, byte x, byte y, byte bT, byte bS, unsigned char *pS)
                     bP = TRUE;
                 }
             }
-            // For FNAME, allow A-Z 1-8 : .
+            // For FNAME, allow A-Z 1-8 * : . <space>
             else if (bT == GFNAME) {
                 // Force upper case if lower typed
                 if ((bC >= 97) && (bC <= 122)) {
                     bC -= 32;
                 }
-                // Check only A-Z
+                // Check only valid chars
                 if (((bC >= 65) && (bC <= 90)) ||
-                    ((bC >= 49) && (bC <= 56)) ||
-                    (bC == 58) || (bC == 46)) {
+                    ((bC >= 48) && (bC <= 56)) ||
+                    (bC == 42) || (bC == 58) || (bC == 46) || (bC == 32)) {
                     bP = TRUE;
                 }
             }
@@ -757,13 +823,13 @@ byte GList(byte bN, byte x, byte y, byte bE, byte bS, byte bM, byte bC, unsigned
                 }
             }
             // Ctrl-Shft-S (start of list)
-            else if (bK == KS_CS) {
+            else if (bK == KEYS_CS) {
                 // Set hilite row to 1, and index to 0
                 bR = 1;
                 bI = 0;
             }
             // Ctrl-Shft-E (end of list)
-            else if (bK == KE_CS) {
+            else if (bK == KEYE_CS) {
                 // If element count > max display
                 if (bC > bM) {
                     // Set hilite row to max display, set index to cound - max display

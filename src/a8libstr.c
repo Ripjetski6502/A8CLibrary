@@ -8,7 +8,7 @@
 //          -Converted from Action!
 //          -Type byte is synonymous with unsigned char (a8defines.h)
 // Require: string.h
-// Revised:
+// Revised: 2025.01.10-Added StrTrm.
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -23,6 +23,7 @@
 void StrInv(unsigned char *pS, byte bS);
 void StrAI(unsigned char *pS, byte bS);
 void StrIA(unsigned char *pS, byte bS);
+void StrTrm(unsigned char *pS);
 
 
 // ------------------------------------------------------------
@@ -115,3 +116,22 @@ void StrIA(unsigned char *pS, byte bS)
     }
 }
 
+
+// ------------------------------------------------------------
+// Func...: void StrTrm(unsigned char *pS)
+// Desc...: Trims trailing space from string.
+// Param..: pS = pointer to string to inverse
+// ------------------------------------------------------------
+void StrTrm(unsigned char *pS)
+{
+    byte bL;
+
+    // Get string length
+    bL = strlen(pS) - 1;
+
+    // Remove trailing whitespace
+    while ((bL >= 0) && (pS[bL] == CHSPACE)) {
+        pS[bL] = '\0';
+        bL--;
+    }
+}

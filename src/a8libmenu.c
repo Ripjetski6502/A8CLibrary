@@ -72,6 +72,12 @@ byte Menu(byte bN, byte x, byte y, byte bO, byte bI, byte bS, byte bC, unsigned 
                 WPrint(bN, x, y+bL, (bL+1 == bR ? WON : WOFF), cL);
             }
         }
+	
+        // If display item is 0, exit
+        if (bS == GDISP) {
+            bF = TRUE;
+            continue;
+        }
 
         // Get key (no inverse key)
         bK = WaitKCX(WOFF);

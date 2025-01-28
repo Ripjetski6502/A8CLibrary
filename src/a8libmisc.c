@@ -8,7 +8,7 @@
 //          -Converted from Action!
 //          -Type byte is synonymous with unsigned char (a8defines.h)
 // Require: string.h
-// Revised:
+// Revised: 2024.12.29 - Added RKC2IKC
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -22,6 +22,7 @@
 // Function Prototypes
 // --------------------------------------------------
 byte IKC2ATA(byte bN);
+byte RKC2IKC(byte bN);
 byte WaitYN(byte bD);
 word WaitKCX(byte bI);
 
@@ -73,6 +74,53 @@ byte IKC2ATA(byte bN)
     return(bR);
 }
 
+
+// ------------------------------------------------------------
+// Func...: byte RKC2IKC(byte bS)
+// Desc...: Converts raw scan code to internal key code
+// Param..: bN = Raw scan code
+// Return.: Internal code for Raw<192
+//          bN for Raw>191
+//          0 for no mapping
+// Notes..: Does not change if Raw>191
+// ------------------------------------------------------------
+byte RKC2IKC(byte bN)
+{
+    byte bR;
+    unsigned char cL[192] = {
+        108, 106,  27,   0,   0, 107,  11,  10, 111,   0,
+        112, 117,   0, 105,  13,  29, 118,   0,  99,   0,
+          0,  98, 120, 122,  20,   0,  19,  22,  91,  21,
+         18,  17,  12,   0,  14, 110,   0, 109,  15,   0,
+        114,   0, 101, 121, 127, 116, 119, 113,  25,   0,
+         16,  23, 126,  24,  28,  30, 102, 104, 100,   0,
+          0, 103, 115,  97,  44,  42,  26,   0,   0,  43,
+         60,  62,  47,   0,  48,  53,   0,  41,  63, 124,
+         54,   0,  35,   0,   0,  34,  56,  58,   4,   0,
+          3,   6,   0,   5,   2,   1,  59,   0,  61,  46,
+          0,  45,  31,   0,  50,   0,  37,  57,   0,  52,
+         55,  49,   8,   0,   9,   7,   0,  32, 125,   0,
+         38,  40,  36,   0,   0,  39,  51,  33,  76,  74,
+        123,   0,   0,  75,  94,  95,  79,   0,  80,  85,
+          0,  73,  92,  93,  86,   0,  67,   0,   0,  66,
+         88,  90,   0,   0,   0,   0,   0,   0,   0,   0,
+         64,   0,  96,  78,   0,  77,   0,   0,  82,   0,
+         69,  89,   0,  84,  87,  81,   0,   0,   0,   0,
+          0,   0,   0,   0,  70,  72,  68,   0,   0,  71,
+         83,  65
+    };
+
+    // Get internal from array if rcode<192
+    if (bN < 192) {
+        bR = cL[bN];
+    }
+    // Else dont change it
+    else {
+        bR = bN;
+    }
+
+    return(bR);
+}
 
 // ------------------------------------------------------------
 // Func...: byte WaitYN(byte bD)
@@ -168,6 +216,9 @@ word WaitKCX(byte bI)
     else {
         cR = bK;
     }
+
+    // Debounce CONSOL
+    POKE(CONSOL, 8);
 
     // Debounce key
     POKE(KEYPCH, KNONE);

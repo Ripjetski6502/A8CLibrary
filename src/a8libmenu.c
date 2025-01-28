@@ -11,6 +11,7 @@
 //          a8libstr.c
 //          a8libmisc.c
 // Revised: 2024.02.20-Correct GVERT dehilite location.
+//          2025.01.24 - Fix var dec in WaitKCX (byte to word) for key.
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -49,7 +50,8 @@ byte Menu(byte bN, byte x, byte y, byte bO, byte bI, byte bS, byte bC, unsigned 
 byte Menu(byte bN, byte x, byte y, byte bO, byte bI, byte bS, byte bC, unsigned char **pS)
 {
     byte bF = FALSE;
-    byte bL, bR, bK;
+    byte bL, bR;
+    word bK;
     unsigned char cL[41];
 
     // Set default return to start item #

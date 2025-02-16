@@ -35,6 +35,8 @@ Version 1.47 brings IsSD() to A8LibDOS, which detects and returns if SpartaDOS i
 
 Version 1.50 brings RAW2INT() to A8LibMisc, which converts raw key codes to internal key codes.  Added GConf() to A8LibGadg which presents a confirmation prompt and asks for Yes/No.  Added GAlertM() and deprecated GAlert() in A8LibGadg.  GAlertM() allows setting a severity warning as the alert window title, which allows for longer messages.  GAlert() is still supported through precompiler translation.  Added StrTrm() to A8LibStr which trims trailing space from a string.  Fixed a bug in Menu() which allowed console keys to function as navigation keys.
 
+Version 1.51 brings additional K codes in a8defines.h.  Fixed a bug in StrIA() which was causing character codes 154 through 160 to not be converted.  Added ByteIA() to A8LibStr, which converts a single byte from internal code to ATASCII.
+
 License: GNU General Public License v3.0
 
 See the LICENSE file for full license information.

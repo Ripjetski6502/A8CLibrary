@@ -9,6 +9,8 @@
 //          -Type byte is synonymous with unsigned char (a8defines.h)
 // Require: string.h
 // Revised: 2025.01.10-Added StrTrm.
+//          2025.02.11-Added ByteIA, made StrIA use ByteIA.
+//          2025.02.14-Correct StrIA missign block 154-160
 // --------------------------------------------------
 
 // --------------------------------------------------
@@ -20,6 +22,7 @@
 // --------------------------------------------------
 // Function Prototypes
 // --------------------------------------------------
+void ByteIA(unsigned char *pS);
 void StrInv(unsigned char *pS, byte bS);
 void StrAI(unsigned char *pS, byte bS);
 void StrIA(unsigned char *pS, byte bS);
@@ -82,6 +85,28 @@ void StrAI(unsigned char *pS, byte bS)
 
 
 // ------------------------------------------------------------
+// Func...: void ByteIA(unsigned char *pS)
+// Desc...: Converts byte from internal code to ATASCII code
+// Param..: pS = pointer to byte to convert
+// ------------------------------------------------------------
+void ByteIA(unsigned char *pS)
+{
+    if (*(pS) < 64) {
+        *(pS) += 32;
+    }
+    else if (*(pS) <= 96) {
+        *(pS) -= 64;
+    }
+    else if ((*(pS) >= 128) && (*(pS) <= 191)) {
+        *(pS) += 32;
+    }
+    else if ((*(pS) >= 192) && (*(pS) <= 223)) {
+        *(pS) -= 64;
+    }
+}
+
+
+// ------------------------------------------------------------
 // Func...: void StrIA(unsigned char *pS, byte bS)
 // Desc...: Converts string from internal code to ATASCII code
 // Param..: pS = pointer to string to convert
@@ -98,13 +123,10 @@ void StrIA(unsigned char *pS, byte bS)
         if (*(pS) < 64) {
             *(pS) += 32;
         }
-        else if (*(pS) <= 96) {
+        else if (*(pS) < 96) {
             *(pS) -= 64;
         }
-        else if ((*(pS) >= 128) && (*(pS) <= 154)) {
-            *(pS) += 32;
-        }
-        else if ((*(pS) >= 160) && (*(pS) <= 191)) {
+        else if ((*(pS) >= 128) && (*(pS) <= 191)) {
             *(pS) += 32;
         }
         else if ((*(pS) >= 192) && (*(pS) <= 223)) {

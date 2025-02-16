@@ -13,13 +13,14 @@
 //                 -Added Character Control Key ATASCII codes
 //                 -Added GAlertM types
 //                 -Added many XL/XE memory locaation codes
+//          2025.02-Added KSLASH codes
 // --------------------------------------------------
 
 #ifndef A8DEFINES_H
 #define A8DEFINES_H
 
 // Version
-#define LIB_VERSION "1.5.0"
+#define LIB_VERSION "1.5.1"
 
 // True & False
 #ifndef TRUE
@@ -92,8 +93,9 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define KNOMAP    199
 #define KNONE     255
 #define KENTER    12
+#define KSLASH    38
 #define KDEL      52
-#define KINS      183
+#define KINS      119
 #define KCLEAR    118
 #define KPLUS     6
 #define KASTER    7
@@ -147,9 +149,9 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 
 // Keystroke Shift combinations
 #define KENTER_S  76
+#define KSLASH_S  102
 #define KESC_S    92
 #define KDEL_S    116
-#define KINS_S    119
 #define KTAB_S    108
 #define KEYA_S    127
 #define KEYB_S    85
@@ -192,6 +194,9 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define KENTER_C  140
 #define KESC_C    156
 #define KDEL_C    180
+#define KSLASH_C  166   // no char
+#define KINS_C    183
+#define KCLEAR_C  182
 #define KTAB_C    172
 #define KEYA_C    191
 #define KEYB_C    149
@@ -236,9 +241,13 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define KDEL_CS   244
 #define KTAB_CS   236
 #define KMINUS_CS 206
+#define KUP_CS    206
 #define KPIPE_CS  207
+#define KDOWN_CS  207
 #define KSLASH_CS 230
 #define KQUOTE_CS 222
+#define KINS_CS   247
+#define KCLEAR_CS 246
 #define KEYD_CS   250
 #define KEYE_CS   234
 #define KEYF_CS   248
@@ -254,6 +263,7 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define KEYS_CS   254
 #define KEYT_CS   237
 #define KEYU_CS   203
+#define KEYW_CS   238
 #define KEYY_CS   235
 #define KEY0_CS   242
 #define KEY1_CS   223
@@ -266,7 +276,8 @@ typedef unsigned int word;		// 16 bits / 2 BYTEs
 #define KEY8_CS   245
 #define KEY9_CS   240
 
-// Console key value
+// Console Key Values
+// As returned by WaitKCX function
 //#define CSTART 6
 #define KCNON  7
 #define KCSTA  262
